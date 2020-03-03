@@ -1,5 +1,5 @@
 package kernel;
-
+//la classe java
 public class Image extends javafx.scene.image.Image {
 
     public Image(String url) {
