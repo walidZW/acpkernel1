@@ -1,6 +1,8 @@
 package kernel;
 //la classe acp
 
+import java.awt.*;
+
 public class Acp {
     private int totalTrainImagesNumber = 200;
     private int trainImagesNumber = 5;
