@@ -1,7 +1,10 @@
 package kernel;
 //la classe acp
 
-import java.awt.*;
+import weka.core.matrix.Matrix;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class Acp {
     private int totalTrainImagesNumber = 200;
@@ -11,6 +14,27 @@ public class Acp {
     private double[][] dataSet;
 
     private EigenSpace eigenSpace = null;
+
+
+   // la méthode ImporterImages: importation des images depuis la base de donnée ORL)
+    public Matrix ImporterImages(){
+        File directory=new File("/acpkernel/orl/");
+        ArrayList<Matrix> trainingimages=new ArrayList<>();
+        for(File fd : directory.listFiles() ){
+              for(File ff :fd.listFiles()) {
+                  //get the image
+
+                  //convert the image to matrix
+
+              }
+
+        }
+
+
+
+
+    }
+    
 
     public Acp(double[][] dataSet){
         this.dataSet = dataSet;
