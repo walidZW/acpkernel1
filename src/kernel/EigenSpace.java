@@ -1,5 +1,6 @@
 package kernel;
 
+import weka.core.EuclideanDistance;
 import weka.core.matrix.Matrix;
 
 import java.util.ArrayList;
@@ -11,13 +12,16 @@ public class EigenSpace {
 
 /*---------------------------------------------------------------------------*/
     private int dimension=-1;
-    Matrix base=null;
-    Matrix centers=null; // nb de classes puis la dimension
+    private Matrix base=null;
+    private Matrix centers=null; // nb de classes puis la dimension
+    private int nbcent;
   /*-----------------------------------------------------------------------------*/
-    public EigenSpace(Matrix s)
+    public EigenSpace(Matrix s,Matrix cent,int nb)
     {
         this.base=s;
-        this.dimension=base.getColumnDimension()*base.getRowDimension() ;
+        this.dimension=base.getRowDimension() ;
+        this.centers=cent;
+        this.nbcent=nb;
     }
 /*--------------------------------------------------------------------------------*/
     public Matrix GetCoordinates( Matrix y) throws Exception {
@@ -26,37 +30,52 @@ public class EigenSpace {
     }
 
     /*-----------------------------------------------------------------------*/
-    public double[] getdistance(Matrix img) throws Exception {
+    public double[] getDistance(Matrix img) throws Exception {
         Matrix c=GetCoordinates(img);
+        double[] dist=new double[this.centers.getColumnDimension()];
         double[][] p=c.getArrayCopy();
-        double sum=0;
-        double min=-1;
-        for (int i=0;i<40;i++) {
-            for (int j = 0 ; j < this.dimension ; j++)
+
+        EuclideanDistance distance=new EuclideanDistance();
+        for (int i=0;i<this.centers.getColumnDimension();i++) {
+           /* for (int j = 0 ; j < this.dimension ; j++)
             {
-                sum += Math.pow(centers[i][j] - p[1][j], 2);
-            }
+                //sum += Math.pow(centers[i][j] - p[1][j], 2);
+            }*/
 
-            if (sum < min) {
-                min = sum;
-            }else if(min==-1) min=sum;
+           dist[i]=distance.distance(img,(Matrix)this.centers.getco);
 
-            sum=0;
         }
-        return Math.sqrt(min);
+
+        return dist;
     }
 
     /*--------------------------------------------------------------------------------*/
 
-    public double[][] calculatecenters(double[][] dataset){
-        int step=0;
-        for (int i=0;i<dataset.length;i++)
-        {
+    public int getDimension() {
+        return dimension;
+    }
 
-            Image1.VectorToImage(dataset[i]);
+    public void setDimension(int dimension) {
+        this.dimension = dimension;
+    }
+
+    public Matrix calculatecenters(Matrix[][] dataset){
+        int step=0;
+        for (int i=0;i<this.nbcent;i++)
+        {
+          for(int j=0;j<5;j++){
+              //get a submatrix
+     //Matrix mat=new Matrix();
+
+              //calculate mean
+
+              //add column to new matrix
+
+          }
+
         }
 
-
+        return null;
     }
 
     /*--------------------------------------------------------------------------------*/
