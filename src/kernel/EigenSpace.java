@@ -3,53 +3,53 @@ package kernel;
 import weka.core.EuclideanDistance;
 import weka.core.matrix.Matrix;
 
-import java.util.ArrayList;
 
-//la classe eigenspace
 public class EigenSpace {
 
+    private int dimension;
+    private Matrix base;
 
 
-/*---------------------------------------------------------------------------*/
-    private int dimension=-1;
-    private Matrix base=null;
-    private Matrix centers=null; // nb de classes puis la dimension
-    private int nbcent;
-  /*-----------------------------------------------------------------------------*/
-    public EigenSpace(Matrix s,Matrix cent,int nb)
+
+    /*---------------------------------------------------------------------------*/
+    public EigenSpace(Matrix s, int dim)
     {
         this.base=s;
-        this.dimension=base.getRowDimension() ;
-        this.centers=cent;
-        this.nbcent=nb;
+        this.dimension=dim;
     }
-/*--------------------------------------------------------------------------------*/
-    public Matrix GetCoordinates( Matrix y) throws Exception {
-        Matrix x=base.transpose().times(y);
+
+    /*----------------------------------------------------------------------------------*/
+    public Matrix getCoordinates( Matrix y){
+        // x is one dimensional column vector
+        Matrix x = base.transpose().times(y);
         return x;
     }
 
-    /*-----------------------------------------------------------------------*/
-    public double[] getDistance(Matrix img) throws Exception {
-        Matrix c=GetCoordinates(img);
-        double[] dist=new double[this.centers.getColumnDimension()];
-        double[][] p=c.getArrayCopy();
+   /*-----------------------------------------------------------------------------------------*/
+    public double getDistance(Matrix vector1, Matrix vector2){
 
-        EuclideanDistance distance=new EuclideanDistance();
-        for (int i=0;i<this.centers.getColumnDimension();i++) {
-           /* for (int j = 0 ; j < this.dimension ; j++)
-            {
-                //sum += Math.pow(centers[i][j] - p[1][j], 2);
-            }*/
-
-           dist[i]=distance.distance(img,(Matrix)this.centers.getco);
-
+        /// vector1 and vector2 must have the same dimension
+        int dim = vector1.getRowDimension();
+        int s = 0;
+        for (int i = 0; i < dim; i++) {
+            s += Math.pow(vector1.get(i, 0) - vector2.get(i, 0), 2);
         }
-
-        return dist;
+        return Math.sqrt(s);
     }
 
-    /*--------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------*/
+    // setter and getters
+
+
+
+    public Matrix getBase() {
+    return base;
+}
+
+    public void setBase(Matrix base) {
+        this.base = base;
+    }
+
 
     public int getDimension() {
         return dimension;
@@ -58,27 +58,5 @@ public class EigenSpace {
     public void setDimension(int dimension) {
         this.dimension = dimension;
     }
-
-    public Matrix calculatecenters(Matrix[][] dataset){
-        int step=0;
-        for (int i=0;i<this.nbcent;i++)
-        {
-          for(int j=0;j<5;j++){
-              //get a submatrix
-     //Matrix mat=new Matrix();
-
-              //calculate mean
-
-              //add column to new matrix
-
-          }
-
-        }
-
-        return null;
-    }
-
-    /*--------------------------------------------------------------------------------*/
-
 
 }
