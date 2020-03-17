@@ -2,6 +2,7 @@ package kernel;
 //la classe acp
 
 import javafx.scene.image.Image;
+import nz.ac.waikato.cs.weka.Utils;
 import weka.core.matrix.Matrix;
 
 import java.io.File;
@@ -15,19 +16,25 @@ public class Acp {
     private int trainImagesNumber = 5;
     final int height = 112;
     final int width = 92;
-    private String path;
-    private final int perosnImages=10;
+    private String path = "orl";
+    private final int personImages=10;
 
     // TODO: 03/03/2020 give a value to threshold
     private double threshold;
     private Matrix dataSet;
     private Matrix centers;
+    private Matrix projectedCenters;
     private Matrix mean;
     private EigenSpace eigenSpace;
 
 
-    // TODO: 03/03/2020 implement this method
-    public Matrix importerImages(String path) throws IOException {
+    Acp(double threshold){
+        this.threshold = threshold;
+    }
+
+
+    // TODO: 13/03/2020 method tested
+    public Matrix importerImages(String path){
 
         File directory = new File(path);
         Matrix total = new Matrix(height * width, directory.listFiles().length * trainImagesNumber);
@@ -47,7 +54,7 @@ public class Acp {
         return total;
     }
 
-
+    // TODO: 16/03/2020 method tested
     public Matrix calculerVisageMoyen(Matrix dataSet){
         Matrix mean = new Matrix(dataSet.getRowDimension(), 1);
         int columnDim = dataSet.getColumnDimension();
@@ -63,21 +70,35 @@ public class Acp {
     }
 
 
-    // TODO: 05/03/2020 Implement this method
     // used to calculate the reduced dimension of the new eigenspace
-    public int reduireDimensions(Matrix eigenvectors){
-        return 0;
+    public Matrix reduireDimensions(Matrix eigenvectors, Matrix eigenvalues){
+
+        double perc = 0.9;
+        double trace = eigenvalues.trace();
+        double s = 0;
+        int i = 0;
+        int cols = eigenvalues.getColumnDimension();
+        int rows = eigenvalues.getRowDimension();
+        while ((s <= perc * trace) && (i < cols) && (i < rows)){
+            s += eigenvalues.get(i, i);
+            i++;
+        }
+
+        Matrix out = new Matrix(eigenvectors.getRowDimension(), i);
+        for (int j = 0; j < i; j++) {
+            Util.replaceColumn(out, Util.getColumnVector(eigenvectors, j), j);
+        }
+        return out;
     }
 
 
-    // TODO: 05/03/2020 Implement this method
     // create the eigenspace from dataSet
     public EigenSpace creerEigenSpace(Matrix eigenvectors, int dim){
-        return null;
+        eigenSpace = new EigenSpace(eigenvectors, dim);
+        return eigenSpace;
     }
 
-
-
+    // TODO: 16/03/2020 test this method
     // project data onto the new eigenspace
     public Matrix projectData(EigenSpace eigenSpace, Matrix dataSet){
 
@@ -95,10 +116,28 @@ public class Acp {
     }
 
 
-    // our main method used to train the model
-    public Matrix trainModel() throws IOException {
+    // TODO: 14/03/2020 check this
+    public void calculateCenters(Matrix dataSet){
+        centers = new Matrix(dataSet.getRowDimension(), Math.floorDiv(dataSet.getColumnDimension(), trainImagesNumber));
+        ArrayList<Matrix> arrayList = new ArrayList<>();
+        int k = 0;
+        for (int i = 0; i < totalTrainImagesNumber - trainImagesNumber + 1; i+=trainImagesNumber) {
+            for (int j = i; j < i + trainImagesNumber; j++) {
+                arrayList.add(Util.getColumnVector(dataSet, j));
+            }
 
-        // import faced from database
+            Util.replaceColumn(centers, Util.mean(arrayList), k);
+            k++;
+            arrayList.clear();
+        }
+    }
+
+
+    // TODO: 16/03/2020 test this
+    // our main method used to train the model
+    public Matrix trainModel(){
+
+        // import faces from database
         dataSet = importerImages(path);
 
         // calculate mean
@@ -109,30 +148,33 @@ public class Acp {
 
         // calculate the eigenvectors of the covariance matrix
         Matrix eigenvectors = dataSet.svd().getU();
+        Matrix singularValues = dataSet.svd().getS();
+        Matrix eigenvalues = Util.squareDiagonal(singularValues);
 
         // the reduced eigenspace dimension
-        int dim = reduireDimensions(eigenvectors);
+        Matrix newBase = reduireDimensions(eigenvectors, eigenvalues);
 
         // create the eigenspace
-        eigenSpace = creerEigenSpace(eigenvectors, dim);
+        eigenSpace = creerEigenSpace(newBase, newBase.getColumnDimension());
 
-        // project data onto the new eigenspace
-        Matrix projectedDataSet = projectData(eigenSpace, dataSet);
 
-        // TODO: 11/03/2020 you need to calculate centers
+        calculateCenters(dataSet);
+        // project data classes onto the new eigenspace
+        Matrix projectedDataClasses = projectData(eigenSpace, centers);
+        projectedCenters = projectedDataClasses;
 
-        return projectedDataSet;
+        return projectedDataClasses;
     }
 
 
+    // TODO: 16/03/2020 test this
     // recognize the new image
     public Result recognize(String path){
-
-        // suppose our model was trained
 
         // convert input face to vector
         Matrix inputFaceMatrix = ImageMat.imageToVector(path);
 
+        // norma
         // subtract mean from inputFaceMatrix
         inputFaceMatrix.minusEquals(mean);
 
@@ -144,7 +186,13 @@ public class Acp {
         ArrayList<Double> distances = new ArrayList<>();
         for (int i = 0; i < centers.getColumnDimension() ; i++) {
 
-            distances.add(eigenSpace.getDistance(Util.getColumnVector(centers, i), projectedInputFaceMatrix));
+            distances.add(eigenSpace.getDistance(Util.getColumnVector(projectedCenters, i), projectedInputFaceMatrix));
+        }
+
+
+        Iterator<Double> iterator0 = distances.iterator();
+        while (iterator0.hasNext()){
+            System.out.println(iterator0.next());
         }
 
         int foundFaces = 0;

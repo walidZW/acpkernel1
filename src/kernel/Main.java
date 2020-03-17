@@ -36,7 +36,6 @@ public class Main extends Application {
 
 
 
-
         Image image1 = ImageMat.matcvToImage(matrix1);
         Image image2 = ImageMat.matcvToImage(matrix2);
         Image image3 = ImageMat.matcvToImage(matrix3);

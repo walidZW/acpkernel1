@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="acpkernel1">
+    <output-path>$PROJECT_DIR$/out/artifacts/acpkernel1</output-path>
+    <root id="root">
+      <element id="archive" name="acpkernel1.jar">
+        <element id="module-output" name="acpkernel1" />
+      </element>
+    </root>
+  </artifact>
+</component>

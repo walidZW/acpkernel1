@@ -1,8 +1,14 @@
 package kernel;
 
+import Jama.util.Maths;
+import org.apache.commons.math.util.MathUtils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import weka.core.Utils;
 import weka.core.matrix.Matrix;
+
+import java.math.MathContext;
+import java.util.ArrayList;
 
 
 // Util class is used for general purpose operations
@@ -65,6 +71,35 @@ public class Util {
             }
         }
         return matcv;
+    }
+
+
+    // used to diagonal elements
+    public static Matrix squareDiagonal(Matrix matrix){
+        Matrix out = new Matrix(matrix.getRowDimension(), matrix.getColumnDimension()) ;
+        if (matrix.getRowDimension() < matrix.getColumnDimension()){
+            for (int i = 0; i < matrix.getRowDimension(); i++) {
+                out.set(i, i, Math.pow(matrix.get(i, i ), 2));
+            }
+        }
+        else {
+            for (int i = 0; i < matrix.getColumnDimension(); i++) {
+                out.set(i, i, Math.pow(matrix.get(i, i ), 2));
+            }
+        }
+        return out;
+    }
+
+    // calculate mean of vectors
+    public static Matrix mean(ArrayList<Matrix> vectors){
+        double number_of_vectors = vectors.size();
+        double div = 1.0 / number_of_vectors;
+        Matrix out = new Matrix(vectors.get(0).getRowDimension(), 1);
+        for (int i = 0; i < number_of_vectors; i++) {
+            out.plusEquals(vectors.get(i));
+        }
+        out.timesEquals(div);
+        return out;
     }
 
 }

@@ -12,7 +12,7 @@ import java.io.InputStream;
 //la classe java
 public class ImageMat{
 
-/*-----------------------------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------------------------------*/
     // construct an opencv matrix from an image
     public static Mat imageToMatcv(String path) {
         Imgcodecs imgcodecs = new Imgcodecs();
@@ -20,7 +20,7 @@ public class ImageMat{
 
         return matrix;
     }
-/*--------------------------------------------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------------------------------------------------*/
     // construct javafx image from an opencv matrix
     public static Image matcvToImage(Mat matrix){
         MatOfByte matOfByte = new MatOfByte();
@@ -30,7 +30,7 @@ public class ImageMat{
         javafx.scene.image.Image image = new javafx.scene.image.Image(in);
         return image;
     }
-/*--------------------------------------------------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------------------------------------------------------*/
     // construct weka one dimensional vector from an image
     public static Matrix imageToVector(String path){
 
@@ -62,8 +62,3 @@ public class ImageMat{
     }
 
 }
-
-
-
-
-
